@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ai_sports_analytics_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ai_sports_analytics_test
+      JWT_SECRET: test_secret_key
+      PORT: 3001
+      NODE_ENV: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install server dependencies
+        run: npm install
+
+      - name: Install client dependencies
+        run: cd client && npm install --legacy-peer-deps
+
+      - name: Setup database
+        run: node server/db/setup.js
+
+      - name: Build client
+        run: cd client && npm run build
+
+      - name: Run server tests
+        run: npm test --if-present
+
+      - name: Run client tests
+        run: cd client && npx react-scripts test --watchAll=false --passWithNoTests
+        env:
+          CI: true

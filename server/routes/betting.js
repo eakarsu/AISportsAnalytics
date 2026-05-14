@@ -1,8 +1,56 @@
 const express = require('express');
+const https = require('https');
 const pool = require('../db/pool');
 const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
+
+// Auto-trigger AI analysis on betting record creation
+async function autoAnalyzeBetting(analysis) {
+  if (!process.env.OPENROUTER_API_KEY) return;
+  try {
+    const prompt = `Analyze this betting opportunity. Sport: ${analysis.sport}, Match: ${analysis.team_a} vs ${analysis.team_b}, Odds A: ${analysis.odds_team_a}, Odds B: ${analysis.odds_team_b}.
+Respond ONLY with valid JSON: {"analysis":{"confidence":<0-100>,"recommendation":"<string>","risk_level":"<Low|Medium|High>","factors":["<string>"],"predicted_winner":"<string>"}}`;
+
+    const data = JSON.stringify({
+      model: process.env.OPENROUTER_MODEL || 'anthropic/claude-3-5-sonnet-20241022',
+      messages: [
+        { role: 'system', content: 'You are an expert sports betting analyst. Always respond with valid JSON only.' },
+        { role: 'user', content: prompt }
+      ],
+      max_tokens: 500, temperature: 0.3
+    });
+
+    const options = {
+      hostname: 'openrouter.ai', port: 443, path: '/api/v1/chat/completions', method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`, 'HTTP-Referer': process.env.CORS_ORIGIN || 'http://localhost:3000', 'X-Title': 'AI Sports Analytics' }
+    };
+
+    const responseText = await new Promise((resolve, reject) => {
+      const req = https.request(options, (res) => {
+        let body = '';
+        res.on('data', c => body += c);
+        res.on('end', () => resolve(body));
+      });
+      req.on('error', reject);
+      req.write(data);
+      req.end();
+    });
+
+    const parsed = JSON.parse(responseText);
+    const content = parsed.choices?.[0]?.message?.content || '';
+    let analysisJson = null;
+    try { analysisJson = JSON.parse(content); } catch (_) {
+      const s = content.indexOf('{'); const e = content.lastIndexOf('}');
+      if (s !== -1 && e !== -1) try { analysisJson = JSON.parse(content.slice(s, e + 1)); } catch (_) {}
+    }
+
+    if (analysisJson) {
+      await pool.query('UPDATE betting_analyses SET ai_analysis=$1, updated_at=NOW() WHERE id=$2',
+        [JSON.stringify(analysisJson), analysis.id]);
+    }
+  } catch (e) { console.error('Auto betting AI analysis failed:', e.message); }
+}
 
 // Get all betting analyses (with pagination)
 router.get('/', async (req, res) => {
@@ -54,7 +102,10 @@ router.post('/', async (req, res) => {
        RETURNING *`,
       [match_name, sport, team_a, team_b, odds_team_a, odds_team_b, odds_draw, predicted_winner, confidence_score, analysis_notes, match_date]
     );
-    res.status(201).json(result.rows[0]);
+    const newRecord = result.rows[0];
+    // Auto-trigger AI analysis asynchronously
+    autoAnalyzeBetting(newRecord).catch(() => {});
+    res.status(201).json(newRecord);
   } catch (error) {
     console.error('Error creating betting analysis:', error);
     res.status(500).json({ error: 'Server error' });

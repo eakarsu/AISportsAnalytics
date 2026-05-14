@@ -27,7 +27,29 @@ import DataExport from './pages/DataExport';
 import FileUpload from './pages/FileUpload';
 import ChartsPage from './pages/ChartsPage';
 import Onboarding from './pages/Onboarding';
+import AIPickTracker from './pages/AIPickTracker';
+import ModelPerformance from './pages/ModelPerformance';
+import InjuryImpact from './pages/InjuryImpact';
+import PerformanceRegression from './pages/PerformanceRegression';
+import LiveBettingOptimize from './pages/LiveBettingOptimize';
+import NewsSentiment from './pages/NewsSentiment';
 import Layout from './components/Layout';
+// === Batch 08 Gaps & Frontend Mounts ===
+import CfCrossSportPlayerValuationForDailyFantasy from './pages/CfCrossSportPlayerValuationForDailyFantasy'
+import CfInjuryTimelineAndPerformanceDecayPrediction from './pages/CfInjuryTimelineAndPerformanceDecayPrediction'
+import CfLiveBettingOptimizationWithRealTimeWin from './pages/CfLiveBettingOptimizationWithRealTimeWin'
+import CfRefereeDecisionPredictionBasedOnContextHistory from './pages/CfRefereeDecisionPredictionBasedOnContextHistory'
+import CfSentimentAnalysisOnSportsNewsCorrelatedWith from './pages/CfSentimentAnalysisOnSportsNewsCorrelatedWith'
+import CfSocialLeaderboardsAndPickFollowing from './pages/CfSocialLeaderboardsAndPickFollowing'
+import GapNoAiDrivenInjuryImpactPrediction from './pages/GapNoAiDrivenInjuryImpactPrediction'
+import GapNoPlayerPerformanceRegressionModeling from './pages/GapNoPlayerPerformanceRegressionModeling'
+import GapNoLiveBettingProbabilityUpdates from './pages/GapNoLiveBettingProbabilityUpdates'
+import GapNoIntegrationWithOfficialLeagueDataApis from './pages/GapNoIntegrationWithOfficialLeagueDataApis'
+import GapNoMultiSportCrossImpactModeling from './pages/GapNoMultiSportCrossImpactModeling'
+import GapNoLiveChatForUserDiscussionTips from './pages/GapNoLiveChatForUserDiscussionTips'
+import GapNoSocialFeaturesFollowingPicksLeaderboards from './pages/GapNoSocialFeaturesFollowingPicksLeaderboards'
+import GapNoWebhooksForDownstreamNotifications from './pages/GapNoWebhooksForDownstreamNotifications'
+import GapNoThirdPartyIntegrationsBeyondImportExport from './pages/GapNoThirdPartyIntegrationsBeyondImportExport'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -92,7 +114,29 @@ function App() {
                       <Route path="/uploads" element={<FileUpload />} />
                       <Route path="/charts" element={<ChartsPage />} />
                       <Route path="/onboarding" element={<Onboarding />} />
-                    </Routes>
+                      <Route path="/ai-picks" element={<AIPickTracker />} />
+                      <Route path="/model-performance" element={<ModelPerformance />} />
+                      <Route path="/injury-impact" element={<InjuryImpact />} />
+                      <Route path="/performance-regression" element={<PerformanceRegression />} />
+                      <Route path="/live-betting-optimize" element={<LiveBettingOptimize />} />
+                      <Route path="/news-sentiment" element={<NewsSentiment />} />
+                    {/* // === Batch 08 Gaps & Frontend Mounts === */}
+        <Route path="/cf-cross-sport-player-valuation-for-daily-fantasy" element={<CfCrossSportPlayerValuationForDailyFantasy />} />
+        <Route path="/cf-injury-timeline-and-performance-decay-prediction" element={<CfInjuryTimelineAndPerformanceDecayPrediction />} />
+        <Route path="/cf-live-betting-optimization-with-real-time-win-probability-updates" element={<CfLiveBettingOptimizationWithRealTimeWin />} />
+        <Route path="/cf-referee-decision-prediction-based-on-context-history" element={<CfRefereeDecisionPredictionBasedOnContextHistory />} />
+        <Route path="/cf-sentiment-analysis-on-sports-news-correlated-with-line" element={<CfSentimentAnalysisOnSportsNewsCorrelatedWith />} />
+        <Route path="/cf-social-leaderboards-and-pick-following" element={<CfSocialLeaderboardsAndPickFollowing />} />
+        <Route path="/gap-no-ai-driven-injury-impact-prediction" element={<GapNoAiDrivenInjuryImpactPrediction />} />
+        <Route path="/gap-no-player-performance-regression-modeling" element={<GapNoPlayerPerformanceRegressionModeling />} />
+        <Route path="/gap-no-live-betting-probability-updates" element={<GapNoLiveBettingProbabilityUpdates />} />
+        <Route path="/gap-no-integration-with-official-league-data-apis-espn" element={<GapNoIntegrationWithOfficialLeagueDataApis />} />
+        <Route path="/gap-no-multi-sport-cross-impact-modeling" element={<GapNoMultiSportCrossImpactModeling />} />
+        <Route path="/gap-no-live-chat-for-user-discussion-tips" element={<GapNoLiveChatForUserDiscussionTips />} />
+        <Route path="/gap-no-social-features-following-picks-leaderboards" element={<GapNoSocialFeaturesFollowingPicksLeaderboards />} />
+        <Route path="/gap-no-webhooks-for-downstream-notifications" element={<GapNoWebhooksForDownstreamNotifications />} />
+        <Route path="/gap-no-third-party-integrations-beyond-import-export" element={<GapNoThirdPartyIntegrationsBeyondImportExport />} />
+        </Routes>
                   </Layout>
                 ) : (
                   <Navigate to="/login" replace />

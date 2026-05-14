@@ -294,6 +294,83 @@ const setupDatabase = async () => {
       )
     `);
 
+    // AI Analyses persistence table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS ai_analyses (
+        id SERIAL PRIMARY KEY,
+        endpoint VARCHAR(100) NOT NULL,
+        input_data JSONB NOT NULL,
+        result_data JSONB NOT NULL,
+        user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        model_used VARCHAR(255),
+        tokens_used INTEGER,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // AI Picks History table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS ai_picks_history (
+        id SERIAL PRIMARY KEY,
+        ai_analysis_id INTEGER REFERENCES ai_analyses(id) ON DELETE SET NULL,
+        betting_id INTEGER REFERENCES betting_analyses(id) ON DELETE SET NULL,
+        predicted_winner VARCHAR(255),
+        confidence_score DECIMAL(5,2),
+        sport VARCHAR(100),
+        match_name VARCHAR(255),
+        actual_outcome VARCHAR(255),
+        is_correct BOOLEAN,
+        recorded_at TIMESTAMP DEFAULT NOW(),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Add ai_analysis column to referee_incidents if not exists
+    await pool.query(`
+      ALTER TABLE referee_incidents ADD COLUMN IF NOT EXISTS ai_analysis JSONB
+    `);
+
+    // Add ai_analysis column to betting_analyses if not exists
+    await pool.query(`
+      ALTER TABLE betting_analyses ADD COLUMN IF NOT EXISTS ai_analysis JSONB
+    `);
+
+    // Add email_verify_token column
+    await pool.query(`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verify_token VARCHAR(255)
+    `);
+
+    // Add reset_token columns to users
+    await pool.query(`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token VARCHAR(255)
+    `);
+    await pool.query(`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_expiry TIMESTAMP
+    `);
+
+    // Create index on ai_analyses for fast lookup by endpoint and user
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_ai_analyses_endpoint ON ai_analyses(endpoint);
+    `);
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_ai_analyses_user_id ON ai_analyses(user_id);
+    `);
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_ai_analyses_created_at ON ai_analyses(created_at DESC);
+    `);
+
+    // Weekly insights digest table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS weekly_insights (
+        id SERIAL PRIMARY KEY,
+        week_start DATE NOT NULL,
+        week_end DATE NOT NULL,
+        digest JSONB NOT NULL,
+        analyses_count INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     console.log('Database tables created successfully');
   } catch (error) {
     console.error('Error setting up database:', error);

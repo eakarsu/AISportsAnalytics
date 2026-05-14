@@ -5,7 +5,7 @@ import {
   LayoutDashboard, TrendingUp, Users, Gamepad2, Trophy, Scale,
   LogOut, Menu, X, User, Zap, Bell, Heart, MessageSquare, Shield,
   Settings, Search, Download, Upload, BarChart3, MessageCircle,
-  Lock, FileText, Compass
+  Lock, FileText, Compass, Activity, TrendingDown, Newspaper
 } from 'lucide-react';
 
 const Layout = ({ children, user, onLogout }) => {
@@ -38,6 +38,10 @@ const Layout = ({ children, user, onLogout }) => {
         { path: '/esports', icon: Trophy, label: 'Esports Tracker' },
         { path: '/referee', icon: Scale, label: 'Referee Assistant' },
         { path: '/charts', icon: BarChart3, label: 'Charts' },
+        { path: '/injury-impact', icon: Activity, label: 'Injury Impact' },
+        { path: '/performance-regression', icon: TrendingDown, label: 'Performance Regression' },
+        { path: '/live-betting-optimize', icon: Zap, label: 'Live Betting Optimize' },
+        { path: '/news-sentiment', icon: Newspaper, label: 'News Sentiment' },
       ]
     },
     {

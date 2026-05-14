@@ -1,7 +1,55 @@
 const express = require('express');
+const https = require('https');
 const pool = require('../db/pool');
+const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
+
+// Auto-trigger AI analysis when creating referee incident
+async function autoAnalyzeRefereeIncident(incident) {
+  try {
+    const prompt = `Analyze this ${incident.sport} referee incident: ${incident.description}. Players: ${incident.players_involved || 'N/A'}. Severity: ${incident.severity}.
+Respond ONLY with valid JSON: {"analysis":{"confidence":<0-100>,"recommendation":"<ruling>","risk_level":"<Warning|Minor Foul|Major Foul|Ejection>","factors":["<string>"],"rule_applied":"<string>","var_recommended":<true|false>}}`;
+
+    const data = JSON.stringify({
+      model: process.env.OPENROUTER_MODEL || 'anthropic/claude-3-5-sonnet-20241022',
+      messages: [
+        { role: 'system', content: 'You are an expert sports official. Always respond with valid JSON only.' },
+        { role: 'user', content: prompt }
+      ],
+      max_tokens: 500, temperature: 0.3
+    });
+
+    const options = {
+      hostname: 'openrouter.ai', port: 443, path: '/api/v1/chat/completions', method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`, 'HTTP-Referer': process.env.CORS_ORIGIN || 'http://localhost:3000', 'X-Title': 'AI Sports Analytics' }
+    };
+
+    const responseText = await new Promise((resolve, reject) => {
+      const req = https.request(options, (res) => {
+        let body = '';
+        res.on('data', c => body += c);
+        res.on('end', () => resolve(body));
+      });
+      req.on('error', reject);
+      req.write(data);
+      req.end();
+    });
+
+    const parsed = JSON.parse(responseText);
+    const content = parsed.choices?.[0]?.message?.content || '';
+    let analysisJson = null;
+    try { analysisJson = JSON.parse(content); } catch (_) {
+      const s = content.indexOf('{'); const e = content.lastIndexOf('}');
+      if (s !== -1 && e !== -1) try { analysisJson = JSON.parse(content.slice(s, e + 1)); } catch (_) {}
+    }
+
+    if (analysisJson) {
+      await pool.query('UPDATE referee_incidents SET ai_analysis=$1, ai_ruling=$2, updated_at=NOW() WHERE id=$3',
+        [JSON.stringify(analysisJson), analysisJson?.analysis?.recommendation || '', incident.id]);
+    }
+  } catch (e) { console.error('Auto AI analysis failed:', e.message); }
+}
 
 // Get all referee incidents (with pagination)
 router.get('/', async (req, res) => {
@@ -53,7 +101,12 @@ router.post('/', async (req, res) => {
        RETURNING *`,
       [match_name, sport, incident_type, description, time_occurred, players_involved, severity, ai_ruling, actual_ruling, video_url]
     );
-    res.status(201).json(result.rows[0]);
+    const incident = result.rows[0];
+    // Auto-trigger AI analysis asynchronously (don't await - fire and forget)
+    if (process.env.OPENROUTER_API_KEY) {
+      autoAnalyzeRefereeIncident(incident).catch(() => {});
+    }
+    res.status(201).json(incident);
   } catch (error) {
     console.error('Error creating incident:', error);
     res.status(500).json({ error: 'Server error' });

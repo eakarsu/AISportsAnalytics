@@ -27,6 +27,8 @@ const searchRoutes = require('./routes/search');
 const adminRoutes = require('./routes/admin');
 const exportRoutes = require('./routes/export');
 const swaggerRoutes = require('./routes/swagger');
+const sportsRoutes = require('./routes/sports');
+const cronRoutes = require('./routes/cron');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -37,9 +39,14 @@ app.use(helmet({
   contentSecurityPolicy: false
 }));
 
-// CORS configuration (#8)
+// CORS configuration - supports comma-separated CORS_ORIGINS env var
+const corsOrigins = (process.env.CORS_ORIGINS || process.env.CORS_ORIGIN || 'http://localhost:3000')
+  .split(',').map(o => o.trim());
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    if (!origin || corsOrigins.includes(origin) || corsOrigins.includes('*')) callback(null, true);
+    else callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 
@@ -91,6 +98,8 @@ app.use('/api/search', searchRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/export', exportRoutes);
 app.use('/api/docs', swaggerRoutes);
+app.use('/api/sports', sportsRoutes);
+app.use('/api/cron', cronRoutes);
 
 // Enhanced health check (#21)
 app.get('/api/health', async (req, res) => {
@@ -126,6 +135,19 @@ app.use((err, req, res, next) => {
     error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message
   });
 });
+
+app.use('/api/cross-sport-valuation', require('./routes/crossSportValuation')); app.use('/api/injury-decay-prediction', require('./routes/injuryDecayPrediction')); app.use('/api/live-betting-optimization', require('./routes/liveBettingOptimization')); app.use('/api/referee-decision-prediction', require('./routes/refereeDecisionPrediction')); app.use('/api/news-sentiment-line-movement', require('./routes/newsSentimentLineMovement')); app.use('/api/social-leaderboards', require('./routes/socialLeaderboards'));
+
+// === Batch 08 Gaps & Frontend Mounts ===
+app.use('/api/gap-no-ai-driven-injury-impact-prediction', require('./routes/gapNoAiDrivenInjuryImpactPrediction'));
+app.use('/api/gap-no-player-performance-regression-modeling', require('./routes/gapNoPlayerPerformanceRegressionModeling'));
+app.use('/api/gap-no-live-betting-probability-updates', require('./routes/gapNoLiveBettingProbabilityUpdates'));
+app.use('/api/gap-no-integration-with-official-league-data-apis-espn', require('./routes/gapNoIntegrationWithOfficialLeagueDataApisEspn'));
+app.use('/api/gap-no-multi-sport-cross-impact-modeling', require('./routes/gapNoMultiSportCrossImpactModeling'));
+app.use('/api/gap-no-live-chat-for-user-discussion-tips', require('./routes/gapNoLiveChatForUserDiscussionTips'));
+app.use('/api/gap-no-social-features-following-picks-leaderboards', require('./routes/gapNoSocialFeaturesFollowingPicksLeaderboards'));
+app.use('/api/gap-no-webhooks-for-downstream-notifications', require('./routes/gapNoWebhooksForDownstreamNotifications'));
+app.use('/api/gap-no-third-party-integrations-beyond-import-export', require('./routes/gapNoThirdPartyIntegrationsBeyondImportExport'));
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

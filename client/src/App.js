@@ -34,6 +34,9 @@ import PerformanceRegression from './pages/PerformanceRegression';
 import LiveBettingOptimize from './pages/LiveBettingOptimize';
 import NewsSentiment from './pages/NewsSentiment';
 import Layout from './components/Layout';
+import CodexCustomVizFeature from './pages/CodexCustomVizFeature';
+import CodexOperationsFeature from './pages/CodexOperationsFeature';
+
 // === Batch 08 Gaps & Frontend Mounts ===
 import CfCrossSportPlayerValuationForDailyFantasy from './pages/CfCrossSportPlayerValuationForDailyFantasy'
 import CfInjuryTimelineAndPerformanceDecayPrediction from './pages/CfInjuryTimelineAndPerformanceDecayPrediction'
@@ -83,6 +86,9 @@ function App() {
       <Router>
         <div className="app-container">
           <Routes>
+        <Route path="/codex/custom-viz" element={<CodexCustomVizFeature />} />
+        <Route path="/codex/operations" element={<CodexOperationsFeature />} />
+
             <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <Login onLogin={handleLogin} />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />

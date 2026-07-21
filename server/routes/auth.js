@@ -11,6 +11,7 @@ const router = express.Router();
 router.post('/register', async (req, res) => {
   try {
     const { email, password, name } = req.body;
+    if (!email || !name || typeof password !== 'string' || password.length < 12) return res.status(400).json({ error: 'Email, name, and a password of at least 12 characters are required' });
 
     const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     if (existingUser.rows.length > 0) {
@@ -41,7 +42,7 @@ router.post('/register', async (req, res) => {
       [result.rows[0].id, verifyToken]
     );
 
-    const token = jwt.sign({ id: result.rows[0].id, email }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    const token = jwt.sign({ id: result.rows[0].id, email, role: 'analyst', tenantId: process.env.GOVERNANCE_TENANT_ID, subjectIds: [`actor:user:${result.rows[0].id}`] }, process.env.JWT_SECRET, { algorithm: 'HS256', expiresIn: '24h' });
 
     res.status(201).json({
       user: result.rows[0],
@@ -70,7 +71,8 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    const role = user.role || 'analyst';
+    const token = jwt.sign({ id: user.id, email: user.email, role, tenantId: process.env.GOVERNANCE_TENANT_ID, subjectIds: [`actor:user:${user.id}`] }, process.env.JWT_SECRET, { algorithm: 'HS256', expiresIn: '24h' });
 
     // Log the login
     await pool.query(
@@ -107,7 +109,7 @@ router.post('/forgot-password', async (req, res) => {
     );
 
     // In production, send email here
-    res.json({ message: 'If that email exists, a reset link has been sent.', token });
+    res.json({ message: 'If that email exists, a reset link has been sent.' });
   } catch (error) {
     console.error('Forgot password error:', error);
     res.status(500).json({ error: 'Server error' });
@@ -118,6 +120,7 @@ router.post('/forgot-password', async (req, res) => {
 router.post('/reset-password', async (req, res) => {
   try {
     const { token, password } = req.body;
+    if (typeof password !== 'string' || password.length < 12) return res.status(400).json({ error: 'Password must be at least 12 characters' });
 
     const result = await pool.query(
       'SELECT * FROM password_resets WHERE token = $1 AND used = false AND expires_at > NOW()',
@@ -172,7 +175,7 @@ router.post('/resend-verification', authenticateToken, async (req, res) => {
       [req.user.id, token]
     );
 
-    res.json({ message: 'Verification email sent', token });
+    res.json({ message: 'If delivery is configured, a verification email will be sent' });
   } catch (error) {
     console.error('Resend verification error:', error);
     res.status(500).json({ error: 'Server error' });
@@ -183,9 +186,9 @@ router.post('/resend-verification', authenticateToken, async (req, res) => {
 router.post('/refresh-token', authenticateToken, async (req, res) => {
   try {
     const newToken = jwt.sign(
-      { id: req.user.id, email: req.user.email },
+      { id: req.user.id, email: req.user.email, role: req.user.role, tenantId: req.user.tenantId, subjectIds: req.user.subjectIds },
       process.env.JWT_SECRET,
-      { expiresIn: '24h' }
+      { algorithm: 'HS256', expiresIn: '24h' }
     );
 
     res.json({ token: newToken });
@@ -193,14 +196,6 @@ router.post('/refresh-token', authenticateToken, async (req, res) => {
     console.error('Refresh token error:', error);
     res.status(500).json({ error: 'Server error' });
   }
-});
-
-// Get demo credentials
-router.get('/demo-credentials', (req, res) => {
-  res.json({
-    email: process.env.DEMO_EMAIL || 'demo@sportsanalytics.com',
-    password: process.env.DEMO_PASSWORD || 'demo123456'
-  });
 });
 
 module.exports = router;

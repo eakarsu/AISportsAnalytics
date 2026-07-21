@@ -27,7 +27,9 @@ jobs:
 
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ai_sports_analytics_test
-      JWT_SECRET: test_secret_key
+      JWT_SECRET: '0123456789abcdef0123456789abcdef'
+      GOVERNANCE_TENANT_ID: ci-tenant
+      ALLOW_SCHEMA_MIGRATION: 1
       PORT: 3001
       NODE_ENV: test
 
@@ -37,7 +39,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install server dependencies
@@ -47,7 +49,9 @@ jobs:
         run: cd client && npm install --legacy-peer-deps
 
       - name: Setup database
-        run: node server/db/setup.js
+        run: |
+          node server/db/setup.js
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f server/migrations/001_governed_workflows.sql
 
       - name: Build client
         run: cd client && npm run build

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Zap, Mail, Lock, LogIn, UserPlus, Sparkles } from 'lucide-react';
+import { Zap, Mail, Lock, LogIn, UserPlus } from 'lucide-react';
 
 const Login = ({ onLogin }) => {
   const [isRegister, setIsRegister] = useState(false);
@@ -30,25 +30,6 @@ const Login = ({ onLogin }) => {
       setError(err.response?.data?.error || 'An error occurred');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fillDemoCredentials = async () => {
-    try {
-      const response = await axios.get('/api/auth/demo-credentials');
-      setFormData({
-        ...formData,
-        email: response.data.email,
-        password: response.data.password
-      });
-      setError('');
-    } catch (err) {
-      // Use default demo credentials if API fails
-      setFormData({
-        ...formData,
-        email: 'demo@sportsanalytics.com',
-        password: 'demo123456'
-      });
     }
   };
 
@@ -252,20 +233,6 @@ const Login = ({ onLogin }) => {
               )}
             </button>
 
-            {!isRegister && (
-              <button
-                type="button"
-                onClick={fillDemoCredentials}
-                className="btn btn-secondary"
-                style={{
-                  width: '100%',
-                  marginBottom: '24px',
-                }}
-              >
-                <Sparkles size={18} />
-                Fill Demo Credentials
-              </button>
-            )}
           </form>
 
           {!isRegister && (

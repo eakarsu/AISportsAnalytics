@@ -1,6 +1,10 @@
 const pool = require('./pool');
 
 const setupDatabase = async () => {
+  if (process.env.ALLOW_SCHEMA_MIGRATION !== '1' && process.env.ALLOW_DESTRUCTIVE_SEED !== '1') {
+    throw new Error('Set ALLOW_SCHEMA_MIGRATION=1 for schema setup');
+  }
+  if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required');
   try {
     // Users table
     await pool.query(`

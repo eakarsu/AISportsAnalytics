@@ -4,8 +4,16 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const setupDatabase = require('./db/setup');
 
+function requireDestructiveSeed() {
+  if (process.env.ALLOW_DESTRUCTIVE_SEED !== '1') throw new Error('Set ALLOW_DESTRUCTIVE_SEED=1 to reset and seed the database');
+  if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required');
+  if ((process.env.SEED_ADMIN_PASSWORD || '').length < 12) throw new Error('SEED_ADMIN_PASSWORD must contain at least 12 characters');
+  return process.env.SEED_ADMIN_PASSWORD;
+}
+
 const seedData = async () => {
   try {
+    const seedPassword = requireDestructiveSeed();
     console.log('Starting database seeding...');
 
     // Setup tables first
@@ -22,8 +30,8 @@ const seedData = async () => {
     `);
 
     // Seed demo user and admin user
-    const hashedPassword = await bcrypt.hash(process.env.DEMO_PASSWORD || 'demo123456', 10);
-    const adminPassword = await bcrypt.hash('admin123456', 10);
+    const hashedPassword = await bcrypt.hash(seedPassword, 12);
+    const adminPassword = await bcrypt.hash(seedPassword, 12);
 
     const demoUser = await pool.query(
       "INSERT INTO users (email, password, name, role, email_verified) VALUES ($1, $2, $3, 'user', true) RETURNING id",

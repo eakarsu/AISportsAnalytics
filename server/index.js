@@ -9,12 +9,9 @@ const logger = require('./middleware/logger');
 const pool = require('./db/pool');
 
 const authRoutes = require('./routes/auth');
-const bettingRoutes = require('./routes/betting');
-const fantasyRoutes = require('./routes/fantasy');
 const strategyRoutes = require('./routes/strategy');
 const esportsRoutes = require('./routes/esports');
 const refereeRoutes = require('./routes/referee');
-const aiRoutes = require('./routes/ai');
 const profileRoutes = require('./routes/profile');
 const settingsRoutes = require('./routes/settings');
 const notificationRoutes = require('./routes/notifications');
@@ -29,9 +26,12 @@ const exportRoutes = require('./routes/export');
 const swaggerRoutes = require('./routes/swagger');
 const sportsRoutes = require('./routes/sports');
 const cronRoutes = require('./routes/cron');
+const { authenticateToken } = require('./middleware/auth');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || process.env.BACKEND_PORT || 3001;
+if ((process.env.JWT_SECRET || '').length < 32 || !process.env.GOVERNANCE_TENANT_ID || !process.env.DATABASE_URL) throw new Error('JWT_SECRET (32+ characters), GOVERNANCE_TENANT_ID, and DATABASE_URL are required');
+const generatedRoutesEnabled = process.env.ENABLE_GENERATED_FEATURES === 'true' && process.env.NODE_ENV !== 'production';
 
 // Security middleware (#7)
 app.use(helmet({
@@ -80,12 +80,13 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // API Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/betting', bettingRoutes);
-app.use('/api/fantasy', fantasyRoutes);
+app.use('/api', authenticateToken);
+if (generatedRoutesEnabled) app.use('/api/betting', require('./routes/betting'));
+if (generatedRoutesEnabled) app.use('/api/fantasy', require('./routes/fantasy'));
 app.use('/api/strategy', strategyRoutes);
 app.use('/api/esports', esportsRoutes);
 app.use('/api/referee', refereeRoutes);
-app.use('/api/ai', aiRoutes);
+if (generatedRoutesEnabled) app.use('/api/ai', require('./routes/ai'));
 app.use('/api/profile', profileRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/notifications', notificationRoutes);
@@ -100,6 +101,8 @@ app.use('/api/export', exportRoutes);
 app.use('/api/docs', swaggerRoutes);
 app.use('/api/sports', sportsRoutes);
 app.use('/api/cron', cronRoutes);
+app.use('/api/governed-sports-analytics', require('./governance'));
+app.use('/api/governance', require('./governance'));
 
 // Enhanced health check (#21)
 app.get('/api/health', async (req, res) => {
@@ -135,19 +138,6 @@ app.use((err, req, res, next) => {
     error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message
   });
 });
-
-app.use('/api/cross-sport-valuation', require('./routes/crossSportValuation')); app.use('/api/injury-decay-prediction', require('./routes/injuryDecayPrediction')); app.use('/api/live-betting-optimization', require('./routes/liveBettingOptimization')); app.use('/api/referee-decision-prediction', require('./routes/refereeDecisionPrediction')); app.use('/api/news-sentiment-line-movement', require('./routes/newsSentimentLineMovement')); app.use('/api/social-leaderboards', require('./routes/socialLeaderboards'));
-
-// === Batch 08 Gaps & Frontend Mounts ===
-app.use('/api/gap-no-ai-driven-injury-impact-prediction', require('./routes/gapNoAiDrivenInjuryImpactPrediction'));
-app.use('/api/gap-no-player-performance-regression-modeling', require('./routes/gapNoPlayerPerformanceRegressionModeling'));
-app.use('/api/gap-no-live-betting-probability-updates', require('./routes/gapNoLiveBettingProbabilityUpdates'));
-app.use('/api/gap-no-integration-with-official-league-data-apis-espn', require('./routes/gapNoIntegrationWithOfficialLeagueDataApisEspn'));
-app.use('/api/gap-no-multi-sport-cross-impact-modeling', require('./routes/gapNoMultiSportCrossImpactModeling'));
-app.use('/api/gap-no-live-chat-for-user-discussion-tips', require('./routes/gapNoLiveChatForUserDiscussionTips'));
-app.use('/api/gap-no-social-features-following-picks-leaderboards', require('./routes/gapNoSocialFeaturesFollowingPicksLeaderboards'));
-app.use('/api/gap-no-webhooks-for-downstream-notifications', require('./routes/gapNoWebhooksForDownstreamNotifications'));
-app.use('/api/gap-no-third-party-integrations-beyond-import-export', require('./routes/gapNoThirdPartyIntegrationsBeyondImportExport'));
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

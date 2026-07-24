@@ -1,6 +1,3 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-
 // Basic smoke test
 test('app renders without crashing', () => {
   // Simple test that the React testing infrastructure works

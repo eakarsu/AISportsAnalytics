@@ -86,7 +86,7 @@ if (generatedRoutesEnabled) app.use('/api/fantasy', require('./routes/fantasy'))
 app.use('/api/strategy', strategyRoutes);
 app.use('/api/esports', esportsRoutes);
 app.use('/api/referee', refereeRoutes);
-if (generatedRoutesEnabled) app.use('/api/ai', require('./routes/ai'));
+app.use('/api/ai', require('./routes/ai'));
 app.use('/api/profile', profileRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/notifications', notificationRoutes);

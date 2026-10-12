@@ -1,3 +1,4 @@
+import recordRows from '../utils/recordRows';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
@@ -41,7 +42,7 @@ const BettingAnalyzer = () => {
   const fetchAnalyses = async () => {
     try {
       const response = await axios.get('/api/betting');
-      setAnalyses(response.data);
+      setAnalyses(recordRows(response.data));
     } catch (error) {
       console.error('Error fetching analyses:', error);
     } finally {

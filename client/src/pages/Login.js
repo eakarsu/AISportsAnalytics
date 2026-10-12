@@ -215,13 +215,14 @@ const Login = ({ onLogin }) => {
 
             <button
               type="button"
-              onClick={() => { setFormData((current) => ({ ...current, email: process.env.REACT_APP_DEMO_EMAIL || '', password: process.env.REACT_APP_DEMO_PASSWORD || '' })); }}
+              onClick={() => { setFormData((current) => ({ ...current, email: process.env.REACT_APP_DEMO_EMAIL, password: process.env.REACT_APP_DEMO_PASSWORD })); setError(''); }}
               disabled={!process.env.REACT_APP_DEMO_EMAIL || !process.env.REACT_APP_DEMO_PASSWORD}
-              aria-label="Auto Fill Demo Credentials"
+              aria-label="Fill demo credentials"
               style={{ width: '100%', marginBottom: '12px', padding: '10px 14px', borderRadius: '8px', border: '1px solid currentColor', background: 'transparent', cursor: 'pointer' }}
             >
-              Auto Fill Demo Credentials
+              Fill Demo Credentials
             </button>
+            {(!process.env.REACT_APP_DEMO_EMAIL || !process.env.REACT_APP_DEMO_PASSWORD) && <p role="status" style={{ color: '#a1a1aa', fontSize: '13px', marginBottom: '12px' }}>Demo credentials are not configured for this browser build.</p>}
             <button
               type="submit"
               disabled={loading}

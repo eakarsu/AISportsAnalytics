@@ -1,0 +1,107 @@
+[
+  {
+    "name": "CfCrossSportPlayerValuationForDailyFantasy",
+    "id": "cf-cross-sport-player-valuation-for-daily-fantasy",
+    "title": "Cross-sport player valuation for daily fantasy",
+    "description": "Prepare a professional advisory report for cross-sport player valuation for daily fantasy using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "CfInjuryTimelineAndPerformanceDecayPrediction",
+    "id": "cf-injury-timeline-and-performance-decay-prediction",
+    "title": "Injury timeline and performance decay prediction",
+    "description": "Prepare a professional advisory report for injury timeline and performance decay prediction using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "CfLiveBettingOptimizationWithRealTimeWin",
+    "id": "cf-live-betting-optimization-with-real-time-win-probability-updates",
+    "title": "Live betting optimization with real-time win-probability updates",
+    "description": "Prepare a professional advisory report for live betting optimization with real-time win-probability updates using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "CfRefereeDecisionPredictionBasedOnContextHistory",
+    "id": "cf-referee-decision-prediction-based-on-context-history",
+    "title": "Referee decision prediction based on context/history",
+    "description": "Prepare a professional advisory report for referee decision prediction based on context/history using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "CfSentimentAnalysisOnSportsNewsCorrelatedWith",
+    "id": "cf-sentiment-analysis-on-sports-news-correlated-with-line",
+    "title": "Sentiment analysis on sports news correlated with line movement",
+    "description": "Prepare a professional advisory report for sentiment analysis on sports news correlated with line movement using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "CfSocialLeaderboardsAndPickFollowing",
+    "id": "cf-social-leaderboards-and-pick-following",
+    "title": "Social leaderboards and pick-following",
+    "description": "Prepare a professional advisory report for social leaderboards and pick-following using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "GapNoAiDrivenInjuryImpactPrediction",
+    "id": "gap-no-ai-driven-injury-impact-prediction",
+    "title": "No AI-driven injury impact prediction",
+    "description": "Prepare a professional advisory report for no ai-driven injury impact prediction using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "GapNoIntegrationWithOfficialLeagueDataApis",
+    "id": "gap-no-integration-with-official-league-data-apis-espn",
+    "title": "No integration with official league data APIs (ESPN, Sportradar)",
+    "description": "Prepare a professional advisory report for no integration with official league data apis (espn, sportradar) using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "GapNoLiveBettingProbabilityUpdates",
+    "id": "gap-no-live-betting-probability-updates",
+    "title": "No live betting probability updates",
+    "description": "Prepare a professional advisory report for no live betting probability updates using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "GapNoLiveChatForUserDiscussionTips",
+    "id": "gap-no-live-chat-for-user-discussion-tips",
+    "title": "No live chat for user discussion/tips",
+    "description": "Prepare a professional advisory report for no live chat for user discussion/tips using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "GapNoMultiSportCrossImpactModeling",
+    "id": "gap-no-multi-sport-cross-impact-modeling",
+    "title": "No multi-sport cross-impact modeling",
+    "description": "Prepare a professional advisory report for no multi-sport cross-impact modeling using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "GapNoPlayerPerformanceRegressionModeling",
+    "id": "gap-no-player-performance-regression-modeling",
+    "title": "No player performance regression modeling",
+    "description": "Prepare a professional advisory report for no player performance regression modeling using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "GapNoSocialFeaturesFollowingPicksLeaderboards",
+    "id": "gap-no-social-features-following-picks-leaderboards",
+    "title": "No social features (following picks, leaderboards)",
+    "description": "Prepare a professional advisory report for no social features (following picks, leaderboards) using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "GapNoThirdPartyIntegrationsBeyondImportExport",
+    "id": "gap-no-third-party-integrations-beyond-import-export",
+    "title": "No third-party integrations beyond import/export",
+    "description": "Prepare a professional advisory report for no third-party integrations beyond import/export using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "GapNoWebhooksForDownstreamNotifications",
+    "id": "gap-no-webhooks-for-downstream-notifications",
+    "title": "No webhooks for downstream notifications",
+    "description": "Prepare a professional advisory report for no webhooks for downstream notifications using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  }
+]

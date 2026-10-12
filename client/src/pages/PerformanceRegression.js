@@ -1,3 +1,4 @@
+import FormattedAIReport from "../components/FormattedAIReport";
 import React, { useState } from 'react';
 import { TrendingDown, AlertCircle } from 'lucide-react';
 
@@ -20,6 +21,12 @@ async function apiPost(path, body) {
   if (!res.ok) throw new Error(data.error || 'Request failed');
   return data;
 }
+
+const examples = [
+  { label: "NBA scoring trend", values: {"player_name": "Example guard", "sport": "NBA", "position": "Shooting guard", "age": "32", "seasons_played": "10", "recent_stats": "{\"points_per_game\":[23.1,21.4,19.8],\"minutes_per_game\":[34,32,30]}"} },
+  { label: "NFL efficiency trend", values: {"player_name": "Example quarterback", "sport": "NFL", "position": "Quarterback", "age": "35", "seasons_played": "13", "recent_stats": "{\"yards_per_attempt\":[7.8,7.3,6.9],\"interception_rate\":[0.021,0.025,0.031]}"} },
+  { label: "Soccer minutes trend", values: {"player_name": "Example forward", "sport": "Soccer", "position": "Forward", "age": "30", "seasons_played": "9", "recent_stats": "{\"goals_per_90\":[0.62,0.54,0.44],\"minutes\":[2800,2520,2210]}"} }
+];
 
 export default function PerformanceRegression() {
   const [form, setForm] = useState({
@@ -70,6 +77,9 @@ export default function PerformanceRegression() {
         <p style={{ color: '#a1a1aa', marginTop: 6, fontSize: 14 }}>Detect regression signals and projected decline curve.</p>
       </div>
 
+      <div role="group" aria-label="Complete example inputs" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+        {examples.map(({ label, values }) => <button key={label} type="button" className="btn btn-secondary" disabled={loading} onClick={() => setForm((current) => ({ ...current, ...values }))}>{label}</button>)}
+      </div>
       <form onSubmit={handleSubmit} style={{ background: 'rgba(30, 30, 50, 0.6)', border: '1px solid rgba(79, 70, 229, 0.3)', borderRadius: 12, padding: 24, marginBottom: 24 }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
           <Field label="Player Name" value={form.player_name} onChange={(v) => handleChange('player_name', v)} />
@@ -99,9 +109,7 @@ export default function PerformanceRegression() {
       {result && (
         <div style={{ background: 'rgba(30, 30, 50, 0.6)', border: '1px solid rgba(79, 70, 229, 0.3)', borderRadius: 12, padding: 20 }}>
           <h2 style={{ color: '#f4f4f5', fontSize: 18, fontWeight: 600, marginBottom: 12 }}>Analysis</h2>
-          <pre style={{ color: '#d4d4d8', fontSize: 12, whiteSpace: 'pre-wrap', background: 'rgba(15, 15, 26, 0.7)', padding: 14, borderRadius: 8, overflow: 'auto' }}>
-            {JSON.stringify(result, null, 2)}
-          </pre>
+          <FormattedAIReport response={result} />
         </div>
       )}
     </div>

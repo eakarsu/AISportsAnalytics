@@ -1,3 +1,4 @@
+import recordRows from '../utils/recordRows';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
@@ -40,7 +41,7 @@ const GameStrategy = () => {
   const fetchStrategies = async () => {
     try {
       const response = await axios.get('/api/strategy');
-      setStrategies(response.data);
+      setStrategies(recordRows(response.data));
     } catch (error) {
       console.error('Error fetching strategies:', error);
     } finally {
@@ -287,6 +288,13 @@ const GameStrategy = () => {
             placeholder="e.g., How do I defend against counter-attacks when using this strategy?"
             style={{ marginBottom: '12px' }}
           />
+          <div role="group" aria-label="Example AI questions" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+            {[
+              ['Opening plan', 'For this selected strategy, which opening moves control the center while preserving a safe retreat?'],
+              ['Counterplay', 'For this selected strategy, how should I respond when the opponent challenges the key move?'],
+              ['Endgame review', 'For this selected strategy, what endgame risks should I check before committing to the next move?'],
+            ].map(([label, question]) => <button key={label} type="button" className="btn btn-secondary" disabled={aiLoading} onClick={() => setCustomQuestion(question)}>{label}</button>)}
+          </div>
           <button
             className="btn btn-primary"
             onClick={getAIAdvice}

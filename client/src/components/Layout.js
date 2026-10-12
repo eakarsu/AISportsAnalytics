@@ -1,3 +1,4 @@
+import AIReportLibrary from "./AIReportLibrary";
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
@@ -208,7 +209,7 @@ const Layout = ({ children, user, onLogout }) => {
         >
           {sidebarOpen ? <X size={16} /> : <Menu size={16} />}
         </button>
-      </aside>
+      <AIReportLibrary /></aside>
 
       <main
         role="main"

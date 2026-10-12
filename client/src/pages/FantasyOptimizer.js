@@ -1,3 +1,4 @@
+import recordRows from '../utils/recordRows';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
@@ -38,7 +39,7 @@ const FantasyOptimizer = () => {
   const fetchTeams = async () => {
     try {
       const response = await axios.get('/api/fantasy');
-      setTeams(response.data);
+      setTeams(recordRows(response.data));
     } catch (error) {
       console.error('Error fetching teams:', error);
     } finally {

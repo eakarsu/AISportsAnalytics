@@ -31,7 +31,9 @@ const { authenticateToken } = require('./middleware/auth');
 const app = express();
 const PORT = process.env.PORT || process.env.BACKEND_PORT || 3001;
 if ((process.env.JWT_SECRET || '').length < 32 || !process.env.GOVERNANCE_TENANT_ID || !process.env.DATABASE_URL) throw new Error('JWT_SECRET (32+ characters), GOVERNANCE_TENANT_ID, and DATABASE_URL are required');
-const generatedRoutesEnabled = process.env.ENABLE_GENERATED_FEATURES === 'true' && process.env.NODE_ENV !== 'production';
+// Core betting and fantasy CRUD back the primary application surfaces (dashboard,
+// analyzers, charts) and must always be mounted. The ENABLE_GENERATED_FEATURES
+// flag only gates optional prototype/gap surfaces, not these core routes.
 
 // Security middleware (#7)
 app.use(helmet({
@@ -81,8 +83,8 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api', authenticateToken);
-if (generatedRoutesEnabled) app.use('/api/betting', require('./routes/betting'));
-if (generatedRoutesEnabled) app.use('/api/fantasy', require('./routes/fantasy'));
+app.use('/api/betting', require('./routes/betting'));
+app.use('/api/fantasy', require('./routes/fantasy'));
 app.use('/api/strategy', strategyRoutes);
 app.use('/api/esports', esportsRoutes);
 app.use('/api/referee', refereeRoutes);
@@ -123,7 +125,16 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-// Serve static files in production
+// Advisory AI reports only; native execution and approval routes stay unchanged.
+const aiWorkspaceSupport = require("./aiWorkspaceAdapters.cjs");
+const aiWorkspaceDatabase = require("./db/pool.js");
+app.use('/api/report-workspace', require("./aiWorkspace.cjs").createAIWorkspaceRouter({
+  pool: aiWorkspaceDatabase, authenticateToken: require("./middleware/auth.js").authenticateToken,
+  aiRateLimiter: aiWorkspaceSupport.createWorkspaceLimiter(), features: require("./aiWorkspaceFeatures.json"),
+}));
+
+// Serve static files in production (after all API routes so the SPA catch-all
+// does not shadow /api/report-workspace or any other API surface).
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/build')));
   app.get('*', (req, res) => {

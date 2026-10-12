@@ -1,3 +1,4 @@
+import recordRows from '../utils/recordRows';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
@@ -53,7 +54,7 @@ const EsportsTracker = () => {
   const fetchPlayers = async () => {
     try {
       const response = await axios.get('/api/esports');
-      setPlayers(response.data);
+      setPlayers(recordRows(response.data));
     } catch (error) {
       console.error('Error fetching players:', error);
     } finally {

@@ -1,3 +1,4 @@
+import FormattedAIReport from "../components/FormattedAIReport";
 import React, { useState } from 'react';
 import { Newspaper, AlertCircle } from 'lucide-react';
 
@@ -24,6 +25,12 @@ async function apiPost(path, body) {
   if (!res.ok) throw new Error(data.error || 'Request failed');
   return data;
 }
+
+const examples = [
+  { label: "NBA injury coverage", values: {"sport": "NBA", "team_or_player": "Boston Celtics", "timeframe": "last_24h", "headlines": "Starting guard listed as questionable before road game\nCoach says rotation decision will come after warmups\nBench unit has improved defensive rating this month"} },
+  { label: "NFL roster news", values: {"sport": "NFL", "team_or_player": "Buffalo Bills", "timeframe": "recent", "headlines": "Offensive line starter returns to practice\nTeam expects weather to affect passing game\nCoach confirms no change at quarterback"} },
+  { label: "Soccer transfer cycle", values: {"sport": "Soccer", "team_or_player": "Arsenal", "timeframe": "last_7d", "headlines": "Club confirms midfielder contract extension\nForward returns to full training\nAnalysts debate impact of fixture congestion"} }
+];
 
 export default function NewsSentiment() {
   const [form, setForm] = useState({
@@ -68,6 +75,9 @@ export default function NewsSentiment() {
         <p style={{ color: '#a1a1aa', marginTop: 6, fontSize: 14 }}>Score sports media sentiment for fantasy/betting impact projections.</p>
       </div>
 
+      <div role="group" aria-label="Complete example inputs" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+        {examples.map(({ label, values }) => <button key={label} type="button" className="btn btn-secondary" disabled={loading} onClick={() => setForm((current) => ({ ...current, ...values }))}>{label}</button>)}
+      </div>
       <form onSubmit={handleSubmit} style={{ background: 'rgba(30, 30, 50, 0.6)', border: '1px solid rgba(79, 70, 229, 0.3)', borderRadius: 12, padding: 24, marginBottom: 24 }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
           <Field label="Sport" value={form.sport} onChange={(v) => handleChange('sport', v)} placeholder="NBA, NFL..." />
@@ -103,9 +113,7 @@ export default function NewsSentiment() {
       {result && (
         <div style={{ background: 'rgba(30, 30, 50, 0.6)', border: '1px solid rgba(79, 70, 229, 0.3)', borderRadius: 12, padding: 20 }}>
           <h2 style={{ color: '#f4f4f5', fontSize: 18, fontWeight: 600, marginBottom: 12 }}>Sentiment</h2>
-          <pre style={{ color: '#d4d4d8', fontSize: 12, whiteSpace: 'pre-wrap', background: 'rgba(15, 15, 26, 0.7)', padding: 14, borderRadius: 8, overflow: 'auto' }}>
-            {JSON.stringify(result, null, 2)}
-          </pre>
+          <FormattedAIReport response={result} />
         </div>
       )}
     </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import FormattedAIReport from '../components/FormattedAIReport';
 import { Zap, AlertCircle } from 'lucide-react';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
@@ -24,6 +25,12 @@ async function apiPost(path, body) {
   if (!res.ok) throw new Error(data.error || 'Request failed');
   return data;
 }
+
+const examples = [
+  { label: "NBA close game", values: {"sport": "NBA", "match": "Boston Celtics vs New York Knicks", "score": "101-98", "time_remaining": "Q4 3:42", "current_odds": "{\"home_ml\":-145,\"away_ml\":125,\"spread\":-2.5}", "momentum": "{\"home_run_last_5_min\":8,\"away_turnovers\":2}", "bankroll": "1000", "risk_tolerance": "low"} },
+  { label: "Soccer late draw", values: {"sport": "Premier League", "match": "Arsenal vs Liverpool", "score": "1-1", "time_remaining": "78th minute", "current_odds": "{\"home_ml\":165,\"draw\":210,\"away_ml\":180}", "momentum": "{\"home_shots_on_target_last_15_min\":3,\"away_shots_on_target_last_15_min\":1}", "bankroll": "750", "risk_tolerance": "medium"} },
+  { label: "NFL second half", values: {"sport": "NFL", "match": "Kansas City Chiefs vs Buffalo Bills", "score": "20-17", "time_remaining": "Q3 6:18", "current_odds": "{\"home_ml\":-120,\"away_ml\":110,\"spread\":-1.5}", "momentum": "{\"home_drives_scoring_last_3\":2,\"away_turnovers\":1}", "bankroll": "1500", "risk_tolerance": "high"} }
+];
 
 export default function LiveBettingOptimize() {
   const [form, setForm] = useState({
@@ -74,6 +81,9 @@ export default function LiveBettingOptimize() {
         <p style={{ color: '#a1a1aa', marginTop: 6, fontSize: 14 }}>AI-driven in-play stake sizing, hedging, and timing recommendations.</p>
       </div>
 
+      <div role="group" aria-label="Complete example inputs" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+        {examples.map(({ label, values }) => <button key={label} type="button" className="btn btn-secondary" disabled={loading} onClick={() => setForm((current) => ({ ...current, ...values }))}>{label}</button>)}
+      </div>
       <form onSubmit={handleSubmit} style={{ background: 'rgba(30, 30, 50, 0.6)', border: '1px solid rgba(79, 70, 229, 0.3)', borderRadius: 12, padding: 24, marginBottom: 24 }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
           <Field label="Sport *" required value={form.sport} onChange={(v) => handleChange('sport', v)} placeholder="NBA, NFL, EPL..." />
@@ -114,14 +124,7 @@ export default function LiveBettingOptimize() {
         </div>
       )}
 
-      {result && (
-        <div style={{ background: 'rgba(30, 30, 50, 0.6)', border: '1px solid rgba(79, 70, 229, 0.3)', borderRadius: 12, padding: 20 }}>
-          <h2 style={{ color: '#f4f4f5', fontSize: 18, fontWeight: 600, marginBottom: 12 }}>Optimization</h2>
-          <pre style={{ color: '#d4d4d8', fontSize: 12, whiteSpace: 'pre-wrap', background: 'rgba(15, 15, 26, 0.7)', padding: 14, borderRadius: 8, overflow: 'auto' }}>
-            {JSON.stringify(result, null, 2)}
-          </pre>
-        </div>
-      )}
+      {result && <FormattedAIReport response={result} title="Optimization" />}
     </div>
   );
 }

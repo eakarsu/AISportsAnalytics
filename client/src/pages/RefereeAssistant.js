@@ -1,3 +1,4 @@
+import recordRows from '../utils/recordRows';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
@@ -52,7 +53,7 @@ const RefereeAssistant = () => {
   const fetchIncidents = async () => {
     try {
       const response = await axios.get('/api/referee');
-      setIncidents(response.data);
+      setIncidents(recordRows(response.data));
     } catch (error) {
       console.error('Error fetching incidents:', error);
     } finally {

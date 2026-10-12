@@ -1,3 +1,4 @@
+import recordRows from '../utils/recordRows';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
@@ -28,7 +29,7 @@ const FeedbackPage = () => {
   const fetchFeedback = async () => {
     try {
       const response = await axios.get('/api/feedback');
-      setFeedbackList(response.data);
+      setFeedbackList(recordRows(response.data));
     } catch (error) {
       console.error('Error fetching feedback:', error);
     } finally {

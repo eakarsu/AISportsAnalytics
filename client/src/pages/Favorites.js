@@ -1,3 +1,4 @@
+import recordRows from '../utils/recordRows';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
@@ -30,7 +31,7 @@ const Favorites = () => {
   const fetchFavorites = async () => {
     try {
       const response = await axios.get('/api/favorites');
-      setFavorites(response.data);
+      setFavorites(recordRows(response.data));
     } catch (error) {
       console.error('Error fetching favorites:', error);
     } finally {

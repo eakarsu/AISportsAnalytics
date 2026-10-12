@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import FormattedAIReport from '../components/FormattedAIReport';
 import { Activity, AlertCircle } from 'lucide-react';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
@@ -20,6 +21,12 @@ async function apiPost(path, body) {
   if (!res.ok) throw new Error(data.error || 'Request failed');
   return data;
 }
+
+const examples = [
+  { label: "NBA ankle sprain", values: {"player_name": "Example point guard", "sport": "NBA", "position": "Point guard", "age": "27", "injury_type": "Grade 2 ankle sprain", "injury_severity": "moderate"} },
+  { label: "NFL hamstring", values: {"player_name": "Example wide receiver", "sport": "NFL", "position": "Wide receiver", "age": "29", "injury_type": "Hamstring strain", "injury_severity": "mild"} },
+  { label: "Soccer ACL injury", values: {"player_name": "Example midfielder", "sport": "Soccer", "position": "Midfielder", "age": "24", "injury_type": "ACL tear", "injury_severity": "severe"} }
+];
 
 export default function InjuryImpact() {
   const [form, setForm] = useState({
@@ -66,6 +73,9 @@ export default function InjuryImpact() {
         <p style={{ color: '#a1a1aa', marginTop: 6, fontSize: 14 }}>AI-driven recovery timeline and downstream performance impact.</p>
       </div>
 
+      <div role="group" aria-label="Complete example inputs" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+        {examples.map(({ label, values }) => <button key={label} type="button" className="btn btn-secondary" disabled={loading} onClick={() => setForm((current) => ({ ...current, ...values }))}>{label}</button>)}
+      </div>
       <form onSubmit={handleSubmit} style={{ background: 'rgba(30, 30, 50, 0.6)', border: '1px solid rgba(79, 70, 229, 0.3)', borderRadius: 12, padding: 24, marginBottom: 24 }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
           <Field label="Player Name" value={form.player_name} onChange={(v) => handleChange('player_name', v)} />
@@ -95,14 +105,7 @@ export default function InjuryImpact() {
         </div>
       )}
 
-      {result && (
-        <div style={{ background: 'rgba(30, 30, 50, 0.6)', border: '1px solid rgba(79, 70, 229, 0.3)', borderRadius: 12, padding: 20 }}>
-          <h2 style={{ color: '#f4f4f5', fontSize: 18, fontWeight: 600, marginBottom: 12 }}>Projection</h2>
-          <pre style={{ color: '#d4d4d8', fontSize: 12, whiteSpace: 'pre-wrap', background: 'rgba(15, 15, 26, 0.7)', padding: 14, borderRadius: 8, overflow: 'auto' }}>
-            {JSON.stringify(result, null, 2)}
-          </pre>
-        </div>
-      )}
+      {result && <FormattedAIReport response={result} title="Projection" />}
     </div>
   );
 }

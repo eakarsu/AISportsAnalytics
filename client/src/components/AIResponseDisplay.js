@@ -1,8 +1,13 @@
+import FormattedAIReport from './FormattedAIReport';
 import React from 'react';
 import { Sparkles, Clock, Cpu, Zap } from 'lucide-react';
 
 const AIResponseDisplay = ({ response, title = 'AI Analysis' }) => {
   if (!response) return null;
+  const content = response.content ?? response;
+  if (typeof content !== 'string' || /^[\[{]/.test(content.trim()) || /^```json/i.test(content.trim())) {
+    return <FormattedAIReport response={response} title={title} />;
+  }
 
   const formatContent = (content) => {
     // Split content into sections based on numbered items or headers
